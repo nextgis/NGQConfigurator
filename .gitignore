@@ -1,0 +1,14 @@
+/.settings
+
+/build
+/dist
+/i18n/*.qm
+/scripts
+/.pydevproject
+/.project
+
+/*.pyc
+/ui/*.pyc
+/ui/*.py
+/resources_rc.py
+/nsis/*.exe

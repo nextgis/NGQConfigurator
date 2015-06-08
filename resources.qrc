@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="NGQConfigurator" >
+        <file>icons/ng.ico</file>
+        <file>i18n/ngq_configurator.qm</file>
+    </qresource>
+</RCC>
