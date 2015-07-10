@@ -3,12 +3,12 @@
 <context>
     <name>AboutPageSettings</name>
     <message>
-        <location filename="ngq_about_page_settings.py" line="51"/>
+        <location filename="ngq_about_page_settings.py" line="57"/>
         <source>Choose about page content file</source>
         <translation>Выбирите файл с содержанием страницы окна &quot;О программе&quot;</translation>
     </message>
     <message>
-        <location filename="ngq_about_page_settings.py" line="68"/>
+        <location filename="ngq_about_page_settings.py" line="76"/>
         <source>Save page content file</source>
         <translation>Сохранить файл с содержанием страницы &quot;О программе&quot;</translation>
     </message>
@@ -54,12 +54,12 @@
 <context>
     <name>BuildInfoWidget</name>
     <message>
-        <location filename="build_info.py" line="112"/>
+        <location filename="build_info.py" line="115"/>
         <source># %1<byte value="x9"/>%2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="build_info.py" line="125"/>
+        <location filename="build_info.py" line="128"/>
         <source>Build time</source>
         <translation>Время сборки</translation>
     </message>
@@ -72,37 +72,37 @@
         <translation type="obsolete"># %1 - Идет сборка</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="146"/>
+        <location filename="build_info.py" line="149"/>
         <source>loading</source>
         <translation>загрузка</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="158"/>
+        <location filename="build_info.py" line="161"/>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="160"/>
+        <location filename="build_info.py" line="163"/>
         <source>minutes</source>
         <translation>минут(ы)</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="162"/>
+        <location filename="build_info.py" line="165"/>
         <source>Start time</source>
         <translation>Время начала</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="162"/>
+        <location filename="build_info.py" line="165"/>
         <source>Estimated end time</source>
         <translation>Ожидаемое время завершения</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="162"/>
+        <location filename="build_info.py" line="165"/>
         <source>Time to end</source>
         <translation>Время до завершения</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="143"/>
+        <location filename="build_info.py" line="146"/>
         <source>Building</source>
         <translation>Идет сборка</translation>
     </message>
@@ -110,27 +110,27 @@
 <context>
     <name>BuildsManagerMain</name>
     <message>
-        <location filename="ngq_builds_manager.py" line="137"/>
+        <location filename="ngq_builds_manager.py" line="142"/>
         <source>Initialization</source>
         <translation>Инициализация</translation>
     </message>
     <message>
-        <location filename="ngq_builds_manager.py" line="139"/>
+        <location filename="ngq_builds_manager.py" line="144"/>
         <source>Resatrting</source>
         <translation>Перезапуск</translation>
     </message>
     <message>
-        <location filename="ngq_builds_manager.py" line="160"/>
+        <location filename="ngq_builds_manager.py" line="165"/>
         <source>Select ngq configuration archive</source>
         <translation>Выбирете конфигурационный архив</translation>
     </message>
     <message>
-        <location filename="ngq_builds_manager.py" line="160"/>
+        <location filename="ngq_builds_manager.py" line="165"/>
         <source>NGQ configuration archive (*.ngqca)</source>
         <translation>Конфигурационный архив NGQ (*.ngqca)</translation>
     </message>
     <message>
-        <location filename="ngq_builds_manager.py" line="191"/>
+        <location filename="ngq_builds_manager.py" line="196"/>
         <source>Set job...</source>
         <translation>Установка сборки</translation>
     </message>
@@ -140,7 +140,7 @@
         <translation type="obsolete">Установка сборки провалилась</translation>
     </message>
     <message>
-        <location filename="ngq_builds_manager.py" line="202"/>
+        <location filename="ngq_builds_manager.py" line="207"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -273,18 +273,28 @@
         <source>Make..</source>
         <translation>Создать..</translation>
     </message>
+    <message>
+        <location filename="ui/about_page_config.ui" line="94"/>
+        <source>Edit...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Downloader</name>
     <message>
-        <location filename="build_info.py" line="50"/>
+        <location filename="build_info.py" line="53"/>
         <source>Save artifact</source>
         <translation>Сохранить артифакт</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="67"/>
+        <location filename="build_info.py" line="70"/>
         <source>Error</source>
         <translation>Ошибка</translation>
+    </message>
+    <message>
+        <location filename="build_info.py" line="19"/>
+        <source>Download file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -421,17 +431,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>InQueueBuildInfoWidget</name>
     <message>
-        <location filename="build_info.py" line="177"/>
+        <location filename="build_info.py" line="180"/>
         <source># %1 - In queue</source>
         <translation># %1 - В очереди</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="179"/>
+        <location filename="build_info.py" line="182"/>
         <source>loading</source>
         <translation>загрузка</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="184"/>
+        <location filename="build_info.py" line="187"/>
         <source>Waiting status: %1</source>
         <translation>Статус ожидания: %1</translation>
     </message>
@@ -457,27 +467,27 @@ p, li { white-space: pre-wrap; }
         <translation>Запланировать сборку</translation>
     </message>
     <message>
-        <location filename="ui/ngq_builds_manager.ui" line="102"/>
+        <location filename="ui/ngq_builds_manager.ui" line="105"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="ui/ngq_builds_manager.ui" line="108"/>
+        <location filename="ui/ngq_builds_manager.ui" line="111"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="ui/ngq_builds_manager.ui" line="116"/>
+        <location filename="ui/ngq_builds_manager.ui" line="119"/>
         <source>Actions</source>
         <translation>Действия</translation>
     </message>
     <message>
-        <location filename="ui/ngq_builds_manager.ui" line="127"/>
+        <location filename="ui/ngq_builds_manager.ui" line="130"/>
         <source>Connection</source>
         <translation>Соединение</translation>
     </message>
     <message>
-        <location filename="ui/ngq_builds_manager.ui" line="132"/>
+        <location filename="ui/ngq_builds_manager.ui" line="135"/>
         <source>Update</source>
         <translation>Обновить</translation>
     </message>
