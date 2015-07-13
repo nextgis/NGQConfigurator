@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import os
-import json
-
+import urlparse
 import xml.etree.ElementTree as ET
 
 from PyQt4.QtGui import *
@@ -12,14 +10,17 @@ from PyQt4.QtNetwork import *
 from ui.ui_plugins_manager import Ui_PluginsManagerWidget
 from ui.ui_plugin_settings import Ui_AddPluginsDialog
 
+
 class PluginSettings(object):
     TypeLocal = 0
     TypeRemote = 1
+
     def __init__(self, name, type, dest):
         self.name = name
         self.type = type
         self.dest = dest
         self.repo_name = ""
+
 
 class PluginSettingsWidget(QDialog, Ui_AddPluginsDialog):
     def __init__(self, parent=None):
@@ -75,7 +76,6 @@ class PluginSettingsWidget(QDialog, Ui_AddPluginsDialog):
             item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
             item.setData(QVariant(Qt.Unchecked), Qt.CheckStateRole)
             item.setData(QVariant(pyqgis_plugin.get('name')), Qt.DisplayRole)
-            #print "name: ",pyqgis_plugin.get('name')
             attrinbutes = {}
             attrinbutes['name'] = pyqgis_plugin.get('name')
             add_attr = lambda attr_name: attrinbutes.update( {attr_name: pyqgis_plugin.find(attr_name).text} ) if pyqgis_plugin.find(attr_name) is not None else attrinbutes.update( {attr_name: ""} )
@@ -83,6 +83,7 @@ class PluginSettingsWidget(QDialog, Ui_AddPluginsDialog):
             add_attr('about')
             add_attr('author_name')
             add_attr('download_url')
+            add_attr('file_name')
 
             item.setData(QVariant(attrinbutes), Qt.UserRole + 1)
             self.model.appendRow(item)
@@ -94,14 +95,16 @@ class PluginSettingsWidget(QDialog, Ui_AddPluginsDialog):
                 <h3> %s </h3>
                 %s <br/>
                 %s: %s <br/>
-                """%(   res[QString('name')],
-                        res[QString('description')],
-                        res[QString("about")],
-                        self.tr("Author"), res[QString("author_name")]
-                    ))
+                %s: %s <br/>
+                """ % (
+                    res[QString('name')],
+                    res[QString('description')],
+                    res[QString("about")],
+                    self.tr("Author"), res[QString("author_name")],
+                    self.tr("Download url"), res[QString("download_url")]))
 
     def accept(self):
-        indexes =  range(0, self.model.rowCount())
+        indexes = range(0, self.model.rowCount())
         for i in indexes:
             item = self.model.item(i)
             pl_attrs = item.data(Qt.UserRole + 1).toPyObject()
@@ -110,15 +113,23 @@ class PluginSettingsWidget(QDialog, Ui_AddPluginsDialog):
                 pl_name = pl_attrs[QString('name')]
                 pl_name = unicode(pl_name.toUtf8(), encoding="UTF-8")
 
-                pl_dwn_url = pl_attrs[QString('download_url')]
-                pl_dwn_url = unicode(pl_dwn_url.toUtf8(), encoding="UTF-8")
+                pl_dwn_url = unicode(
+                            pl_attrs[QString('download_url')].toUtf8(),
+                            encoding="UTF-8")
 
-                pl = PluginSettings(pl_name, PluginSettings.TypeRemote, pl_dwn_url)
-                pl.repo_name = unicode(self.qgisRepos.currentText().toUtf8(), encoding="UTF-8")
+                pl = PluginSettings(
+                        pl_name,
+                        PluginSettings.TypeRemote,
+                        pl_dwn_url)
+
+                pl.repo_name = unicode(
+                                       self.qgisRepos.currentText().toUtf8(),
+                                       encoding="UTF-8")
 
                 self.plugins.append(pl)
 
         super(PluginSettingsWidget, self).accept()
+
 
 class PluginsOption(QWidget, Ui_PluginsManagerWidget):
     def __init__(self, option, parent=None):
@@ -145,12 +156,12 @@ class PluginsOption(QWidget, Ui_PluginsManagerWidget):
                 item = QListWidgetItem(self.listWidget)
 
                 if plugin_settings[u'type'] == PluginSettings.TypeLocal:
-                    plugin = PluginSettings(plugin_settings[u'name'], plugin_settings[u'type'], plugin_settings[u'dest'] )
+                    plugin = PluginSettings(plugin_settings[u'name'], plugin_settings[u'type'], plugin_settings[u'dest'])
                     item.setData(Qt.DisplayRole, plugin_settings[u'name'] + " [%s]"%plugin_settings[u'dest'])
                     item.setData(Qt.UserRole + 1, plugin)
 
                 if plugin_settings[u'type'] == PluginSettings.TypeRemote:
-                    plugin = PluginSettings(plugin_settings[u'name'], plugin_settings[u'type'], plugin_settings[u'dest'] )
+                    plugin = PluginSettings(plugin_settings[u'name'], plugin_settings[u'type'], plugin_settings[u'dest'])
                     plugin.repo_name = plugin_settings['repo_name']
                     item.setData(Qt.DisplayRole, plugin_settings[u'name'] + " [%s]"%plugin_settings[u'repo_name'])
                     item.setData(Qt.UserRole + 1, plugin)

@@ -3,12 +3,12 @@
 <context>
     <name>AboutPageSettings</name>
     <message>
-        <location filename="ngq_about_page_settings.py" line="57"/>
+        <location filename="ngq_about_page_settings.py" line="63"/>
         <source>Choose about page content file</source>
         <translation>Выбирите файл с содержанием страницы окна &quot;О программе&quot;</translation>
     </message>
     <message>
-        <location filename="ngq_about_page_settings.py" line="76"/>
+        <location filename="ngq_about_page_settings.py" line="82"/>
         <source>Save page content file</source>
         <translation>Сохранить файл с содержанием страницы &quot;О программе&quot;</translation>
     </message>
@@ -148,7 +148,7 @@
 <context>
     <name>ConfigPackageMakerDialog</name>
     <message>
-        <location filename="ngq_configurator.py" line="27"/>
+        <location filename="ngq_configurator.py" line="28"/>
         <source>Make configuration package</source>
         <translation>Создать конфигурационный пакет</translation>
     </message>
@@ -276,7 +276,7 @@
     <message>
         <location filename="ui/about_page_config.ui" line="94"/>
         <source>Edit...</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать</translation>
     </message>
 </context>
 <context>
@@ -294,7 +294,7 @@
     <message>
         <location filename="build_info.py" line="19"/>
         <source>Download file</source>
-        <translation type="unfinished"></translation>
+        <translation>Скачать файл</translation>
     </message>
 </context>
 <context>
@@ -305,7 +305,7 @@
         <translation type="obsolete">Выберите %s</translation>
     </message>
     <message>
-        <location filename="ngq_configurator_options.py" line="146"/>
+        <location filename="ngq_configurator_options.py" line="158"/>
         <source>Choose</source>
         <translation>Выбрать</translation>
     </message>
@@ -313,7 +313,7 @@
 <context>
     <name>FileOptionBase</name>
     <message>
-        <location filename="ngq_configurator_options.py" line="67"/>
+        <location filename="ngq_configurator_options.py" line="79"/>
         <source>Select</source>
         <translation>Выбрать</translation>
     </message>
@@ -418,12 +418,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ImageOption</name>
     <message>
-        <location filename="ngq_configurator_options.py" line="113"/>
+        <location filename="ngq_configurator_options.py" line="124"/>
         <source>Image not selected</source>
         <translation>Изображение не выбрано</translation>
     </message>
     <message>
-        <location filename="ngq_configurator_options.py" line="94"/>
+        <location filename="ngq_configurator_options.py" line="108"/>
         <source>Choose</source>
         <translation>Выбрать</translation>
     </message>
@@ -500,22 +500,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>NGQConfigurator</name>
     <message>
-        <location filename="ngq_configurator.py" line="360"/>
+        <location filename="ngq_configurator.py" line="365"/>
         <source>Save configuration file</source>
         <translation>Сохранить файл конфигурации</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="360"/>
+        <location filename="ngq_configurator.py" line="365"/>
         <source>NGQ configuration file (*.ngqc)</source>
         <translation>Конфигурационный файл NGQ (*.ngqc)</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="382"/>
+        <location filename="ngq_configurator.py" line="387"/>
         <source>Open configuration file</source>
         <translation>Открыть конфигурационный файл</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="382"/>
+        <location filename="ngq_configurator.py" line="387"/>
         <source>NGQ configuration archive (*.ngqca)</source>
         <translation>Конфигурационный архив NGQ (*.ngqca)</translation>
     </message>
@@ -570,42 +570,42 @@ p, li { white-space: pre-wrap; }
         <translation>Страницы окна &quot;О программе&quot;</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="221"/>
+        <location filename="ngq_configurator.py" line="224"/>
         <source>Program name</source>
         <translation>Название программы (англ.)</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="247"/>
+        <location filename="ngq_configurator.py" line="250"/>
         <source>NGQ Icon</source>
         <translation>Иконка NGQ</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="253"/>
+        <location filename="ngq_configurator.py" line="256"/>
         <source>NGQ Splash</source>
         <translation>Сплэш NGQ</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="281"/>
+        <location filename="ngq_configurator.py" line="284"/>
         <source>NGQ Title eng</source>
         <translation>Заголовок (англ.)</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="292"/>
+        <location filename="ngq_configurator.py" line="295"/>
         <source>NGQ Title tr</source>
         <translation>Заголовок</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="262"/>
+        <location filename="ngq_configurator.py" line="265"/>
         <source>Installer name</source>
         <translation>Название инсталятора (англ.)</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="273"/>
+        <location filename="ngq_configurator.py" line="276"/>
         <source>Run shortcut name</source>
         <translation>Имя ярлыка запуска</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="297"/>
+        <location filename="ngq_configurator.py" line="300"/>
         <source>Default project</source>
         <translation>Проект по-умолчанию</translation>
     </message>
@@ -620,7 +620,7 @@ p, li { white-space: pre-wrap; }
         <translation>Репозиторий QGIS</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="302"/>
+        <location filename="ngq_configurator.py" line="307"/>
         <source>Default qgis options</source>
         <translation>Настройки qgis по-умолчанию</translation>
     </message>
@@ -630,7 +630,7 @@ p, li { white-space: pre-wrap; }
         <translation>Новый</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="399"/>
+        <location filename="ngq_configurator.py" line="404"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -650,17 +650,17 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="284"/>
+        <location filename="ngq_configurator.py" line="287"/>
         <source>Only Latin characters!</source>
         <translation>Только латинские символы</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="224"/>
+        <location filename="ngq_configurator.py" line="227"/>
         <source>Name of program - identificator for Windows. Only Latin characters!</source>
         <translation>Название программы. Используется для идентификации в ОС Windows. Используйте только латинские символы!</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="254"/>
+        <location filename="ngq_configurator.py" line="257"/>
         <source>Image</source>
         <translation>Изображение</translation>
     </message>
@@ -668,6 +668,11 @@ p, li { white-space: pre-wrap; }
         <location filename="ui/ngq_configurator.ui" line="256"/>
         <source>Save as ...</source>
         <translation>Сохранить как ...</translation>
+    </message>
+    <message>
+        <location filename="ngq_configurator.py" line="301"/>
+        <source>QGIS Project</source>
+        <translation>Проект QGIS</translation>
     </message>
 </context>
 <context>
@@ -691,6 +696,29 @@ p, li { white-space: pre-wrap; }
         <location filename="ui/plugins_manager.ui" line="43"/>
         <source>Delete</source>
         <translation>Удалить</translation>
+    </message>
+</context>
+<context>
+    <name>QGISOptionSetSettings</name>
+    <message>
+        <location filename="ngq_configurator_option_qgs_opts.py" line="16"/>
+        <source>QGIS Options set name</source>
+        <translation>Название настроек QGIS</translation>
+    </message>
+    <message>
+        <location filename="ngq_configurator_option_qgs_opts.py" line="20"/>
+        <source>QGIS Options set dir</source>
+        <translation>Директория с настройками QGIS</translation>
+    </message>
+    <message>
+        <location filename="ngq_configurator_option_qgs_opts.py" line="24"/>
+        <source>Choose</source>
+        <translation>Выбрать</translation>
+    </message>
+    <message>
+        <location filename="ngq_configurator_option_qgs_opts.py" line="46"/>
+        <source>Select qgis options directory</source>
+        <translation>Выбрать директорию с настройками QGIS</translation>
     </message>
 </context>
 <context>
@@ -724,6 +752,31 @@ p, li { white-space: pre-wrap; }
         <location filename="ngq_configurator_options.py" line="226"/>
         <source>Select QGIS option dir</source>
         <translation type="obsolete">Выбрать директорию с настройками QGIS</translation>
+    </message>
+    <message>
+        <location filename="ngq_configurator_option_qgs_opts.py" line="66"/>
+        <source>QGIS Options sets</source>
+        <translation>Наборы настроек QGIS</translation>
+    </message>
+    <message>
+        <location filename="ngq_configurator_option_qgs_opts.py" line="110"/>
+        <source>Add</source>
+        <translation>Добавить</translation>
+    </message>
+    <message>
+        <location filename="ngq_configurator_option_qgs_opts.py" line="78"/>
+        <source>Edit</source>
+        <translation>Редактировать</translation>
+    </message>
+    <message>
+        <location filename="ngq_configurator_option_qgs_opts.py" line="83"/>
+        <source>Del</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location filename="ngq_configurator_option_qgs_opts.py" line="105"/>
+        <source>max</source>
+        <translation>макс.</translation>
     </message>
 </context>
 <context>
@@ -762,12 +815,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>QGISReposModel</name>
     <message>
-        <location filename="ngq_configurator.py" line="53"/>
+        <location filename="ngq_configurator.py" line="55"/>
         <source>Name</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="ngq_configurator.py" line="53"/>
+        <location filename="ngq_configurator.py" line="55"/>
         <source>URL</source>
         <translation></translation>
     </message>

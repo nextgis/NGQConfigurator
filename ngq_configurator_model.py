@@ -7,10 +7,10 @@ import tempfile
 import zipfile
 
 from PyQt4.QtCore import *
-import xml.etree.ElementTree as ET
 from PyQt4.QtNetwork import *
 
 from logger import *
+
 
 class CustomizationOption(QObject):
     changed = pyqtSignal()
@@ -19,7 +19,8 @@ class CustomizationOption(QObject):
 
     def __init__(self, name, parent=None, **kwargs):
         # kwargs:
-        #     u'default_value' - default option value may be unicode or tuple(option, dened_func)
+        #   u'default_value' -
+        #    default option value may be unicode or tuple(option, dened_func)
         QObject.__init__(self, parent)
         self.__name = name
         self.__value = None
@@ -32,7 +33,7 @@ class CustomizationOption(QObject):
                 self.__defalut_value[0].changed.connect(self.changed.emit)
 
     def __str__(self):
-        return "CustomizationOption with name '%s'"%self.__name
+        return "CustomizationOption with name '%s'" % self.__name
 
     def setDefaultValue(self):
         self.__value = None
@@ -73,6 +74,7 @@ class CustomizationOption(QObject):
         self.__value = None
         self.changed.emit()
 
+
 class StringCustomizationOption(CustomizationOption):
     def __init__(self, name, parent=None, **kwargs):
         CustomizationOption.__init__(self, name, parent, **kwargs)
@@ -81,52 +83,73 @@ class StringCustomizationOption(CustomizationOption):
         return {self.getName(): self.value}
 
     def _prepareForArchive(self, archive_root_dir):
-        self.prepareForArchiveProcess.emit(0,0)
+        self.prepareForArchiveProcess.emit(0, 0)
+
+        if self.value is None:
+            return {}
+
         return {self.getName(): self.value}
+
 
 class FileCustomizationOption(CustomizationOption):
     def __init__(self, name, parent=None, **kwargs):
         CustomizationOption.__init__(self, name, parent, **kwargs)
 
     def _prepareForArchive(self, archive_root_dir):
-        self.prepareForArchiveProcess.emit(0,0)
-        if self.value is not None:
-            if QFileInfo(self.value).isFile():
-                file_base_name = os.path.basename(self.value)
-                shutil.copyfile( self.value, os.path.join(archive_root_dir,file_base_name) )
-                return {self.getName(): file_base_name}
-            else:
-                dir_base_name = os.path.basename(self.value)
-                shutil.copytree(
-                    self.value,
-                    os.path.join(archive_root_dir, dir_base_name) )
-                return {self.getName(): dir_base_name}
-        else:
+        self.prepareForArchiveProcess.emit(0, 0)
+        if self.value is None:
             return {}
+
+        if QFileInfo(self.value).isFile():
+            file_base_name = os.path.basename(self.value)
+            shutil.copyfile(
+                    self.value,
+                    os.path.join(archive_root_dir, file_base_name))
+
+            return {self.getName(): file_base_name}
+        else:
+            dir_base_name = os.path.basename(self.value)
+            shutil.copytree(
+                self.value,
+                os.path.join(archive_root_dir, dir_base_name))
+            return {self.getName(): dir_base_name}
 
     def _asDict(self):
         return {self.getName(): self.value}
+
 
 class QGISOptionsOption(CustomizationOption):
     """
         {"<options set name>": "<options set dir>", ...}
     """
     def __init__(self, parent=None, **kwargs):
-        CustomizationOption.__init__(self, u"default_qgis_options_dirs", parent, **kwargs)
+        CustomizationOption.__init__(
+                self,
+                u"default_qgis_options_dirs",
+                parent, **kwargs)
 
     def _prepareForArchive(self, archive_root_dir):
         configuration = {}
+        if self.value is None:
+            return {}
+
         for opt_set_name in self.value.keys():
             shutil.copytree(
                     self.value[opt_set_name],
-                    os.path.join(archive_root_dir, opt_set_name + "-" + os.path.basename(self.value[opt_set_name])) )
+                    os.path.join(
+                        archive_root_dir,
+                        opt_set_name + "-" + os.path.basename(
+                            self.value[opt_set_name])))
 
-            configuration[opt_set_name] = opt_set_name + "-" + os.path.basename(self.value[opt_set_name])
+            configuration[opt_set_name] = "{0}-{1}".format(
+                       opt_set_name,
+                       os.path.basename(self.value[opt_set_name]))
 
         return {self.getName(): configuration}
 
     def _asDict(self):
         return {self.getName(): self.value}
+
 
 class PluginsCustomizationOption(CustomizationOption):
     def __init__(self, name, parent=None, **kwargs):
@@ -138,7 +161,7 @@ class PluginsCustomizationOption(CustomizationOption):
             return {self.getName(): []}
 
         configuration = []
-        plugins_dir = os.path.join(archive_root_dir,"plugins")
+        plugins_dir = os.path.join(archive_root_dir, "plugins")
         os.mkdir(plugins_dir)
 
         self.prepareForArchiveProcess.emit(0, len(self.value))
@@ -148,7 +171,7 @@ class PluginsCustomizationOption(CustomizationOption):
             if plugin[u'type'] == 0:
                 shutil.copytree(
                     os.path.join(plugin[u'dest'], plugin[u'name']),
-                    os.path.join(plugins_dir, plugin[u'name']) )
+                    os.path.join(plugins_dir, plugin[u'name']))
 
             elif plugin[u'type'] == 1:
                 self.pd = PluginDownloader(plugin[u'dest'], plugin[u'name'])
@@ -166,13 +189,17 @@ class PluginsCustomizationOption(CustomizationOption):
     def _asDict(self):
         return {self.getName(): self.value}
 
+
 class AboutPagesCustomizationOption(CustomizationOption):
     def __init__(self, name, parent=None, **kwargs):
         CustomizationOption.__init__(self, name, parent, **kwargs)
 
     def _prepareForArchive(self, archive_root_dir):
+        if self.value is None:
+            return {}
+
         configuration = []
-        files_dir = os.path.join(archive_root_dir,"about_pages_contents")
+        files_dir = os.path.join(archive_root_dir, "about_pages_contents")
         os.mkdir(files_dir)
 
         self.prepareForArchiveProcess.emit(0, len(self.value))
@@ -181,8 +208,12 @@ class AboutPagesCustomizationOption(CustomizationOption):
             configuration.append(page)
 
             if page.has_key(u'content_file'):
-                src_file = open( page[u'content_file'], "r" )
-                dst_file = open( os.path.join(files_dir, os.path.basename(page[u'content_file'])), "w" )
+                src_file = open(page[u'content_file'], "r")
+                dst_file = open(
+                            os.path.join(
+                                files_dir,
+                                os.path.basename(page[u'content_file'])),
+                            "w")
 
                 for src_line in src_file:
                     dst_line = src_line
@@ -214,6 +245,7 @@ class AboutPagesCustomizationOption(CustomizationOption):
 
     def _asDict(self):
         return {self.getName(): self.value}
+
 
 class NGQConfiguratorModel(QObject):
     saveArchiveProgressStarted = pyqtSignal()
@@ -277,13 +309,13 @@ class NGQConfiguratorModel(QObject):
             except ValueError:
                 pass
 
-
     def loadFromArchive(self,filename):
         pass
 
     def reset(self):
         for option in self.__options:
                 option.reset()
+
 
 class ConfigArchiveMaker(QObject):
         started = pyqtSignal()
@@ -363,8 +395,9 @@ class ConfigArchiveMaker(QObject):
 
             zipf.close()
 
+
 class PluginDownloader(QObject):
-    def __init__(self, download_url, plugin_name, parent = None):
+    def __init__(self, download_url, plugin_name, parent=None):
         QObject.__init__(self, parent)
 
         self.__download_url = download_url
@@ -374,21 +407,33 @@ class PluginDownloader(QObject):
         self.__net_request = QNetworkRequest(QUrl(self.__download_url))
 
     def download(self, dest_dir):
-        print "self.__download_url: ", self.__download_url
-        if self.__download_url.split('/')[-1] == "":
-            return False
-
-        download_file = os.path.join(dest_dir, self.__download_url.split('/')[-1])
-
-        print "download_file: ", download_file
-        print "download_file: ", len(download_file)
-
+        Log("Download plugin with url: %s" % self.__download_url, u'info' )
 
         self.loop = QEventLoop()
-        #self.__net_request = QNetworkRequest(QUrl(self.__download_url))
+        self.__net_request = QNetworkRequest(QUrl(self.__download_url))
+
         self.__replay = self.__net_manager.get(self.__net_request)
         self.__replay.finished.connect(self.loop.quit)
         self.loop.exec_()
+
+        download_file = "unknown_plugin"
+
+        if self.__download_url.split('/')[-1] != "":
+            download_file = self.__download_url.split('/')[-1]
+        else:
+            content_desp = unicode(
+                    QString(self.__replay.rawHeader('Content-Disposition')),
+                    encoding="UTF-8") + ";"
+            print "content_desp: ", content_desp
+            m = re.search("filename=.*;", content_desp)
+            if m is not None:
+                download_file = m.group()[9:-1]
+
+        download_file = os.path.join(
+                                dest_dir,
+                                download_file)
+
+        Log("Download plugin to file: %s" % download_file, u'info' )
 
         with open(download_file, 'wb') as f:
             f.write(self.__replay.readAll())
@@ -398,6 +443,7 @@ class PluginDownloader(QObject):
         os.remove(download_file)
 
         return True
+
     def unzip(self, source_filename, dest_dir):
         with zipfile.ZipFile(source_filename) as zf:
             zf.extractall(dest_dir)

@@ -7,6 +7,7 @@ SOURCES =   ngq_configurator.py \
             ngq_configurator_model.py \
             ngq_configurator_options.py \
             ngq_jenkins_worker.py \
+            ngq_configurator_option_qgs_opts.py \
 
 FORMS = ui/ngq_configurator.ui \
         ui/ngq_builds_manager.ui \
@@ -16,5 +17,5 @@ FORMS = ui/ngq_configurator.ui \
         ui/about_page_config.ui \
         ui/about_pages_manager.ui \
         ui/html_editor.ui \
-        
+
 TRANSLATIONS = i18n/ngq_configurator.ts
