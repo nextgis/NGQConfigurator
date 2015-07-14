@@ -6,7 +6,7 @@ RequestExecutionLevel admin
 !define SRC "..\dist"
 !define PROGRAM_NAME "NGQ Configurator"
 !define INSTALLER_NAME "ngq_configurator_setup"
-!define PROGRAM_VERSION "0.0.4"
+!define PROGRAM_VERSION "0.0.6"
 !define UNINSTALLER_NAME "uninstall.exe"
 !define CONFIGURATOR_RUN_LNK_NAME "NGQ Configurator"
 !define BUILD_MANAGER_RUN_LNK_NAME "Build manager"

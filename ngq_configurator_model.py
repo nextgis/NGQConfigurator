@@ -166,7 +166,11 @@ class PluginsCustomizationOption(CustomizationOption):
 
         self.prepareForArchiveProcess.emit(0, len(self.value))
         counter = 0
+
         for plugin in self.value:
+
+            Log("Prepare plugin: %s" % plugin[u'name'], u'info' )
+
             download_fail = False
             if plugin[u'type'] == 0:
                 shutil.copytree(
@@ -174,9 +178,15 @@ class PluginsCustomizationOption(CustomizationOption):
                     os.path.join(plugins_dir, plugin[u'name']))
 
             elif plugin[u'type'] == 1:
-                self.pd = PluginDownloader(plugin[u'dest'], plugin[u'name'])
-                if self.pd.download(plugins_dir) == False:
+                Log("Download plugin from %s" % plugin[u'dest'], u'info' )
+                self.pd = PluginDownloader(plugin[u'dest'])
+                pl_name = self.pd.download(plugins_dir)
+                if pl_name is None:
                     download_fail = True
+                else:
+                    plugin[u'name'] = pl_name
+
+                Log("Download plugin name %s" % plugin[u'name'], u'info' )
 
             if not download_fail:
                 configuration.append({u'name': plugin[u'name']})
@@ -357,8 +367,7 @@ class ConfigArchiveMaker(QObject):
 
             settings_file = open(os.path.join(self.__archive_prepare_dir,"settings.txt"), 'w')
             data = json.dumps(configuration)
-            print "data: ", data
-            # settings_file.write()
+            settings_file.write(data)
             settings_file.close()
 
             self.__zipping()
@@ -399,17 +408,16 @@ class ConfigArchiveMaker(QObject):
 
 
 class PluginDownloader(QObject):
-    def __init__(self, download_url, plugin_name, parent=None):
+    def __init__(self, download_url, parent=None):
         QObject.__init__(self, parent)
 
         self.__download_url = download_url
-        self.__plugin_name = plugin_name
 
         self.__net_manager = QNetworkAccessManager()
         self.__net_request = QNetworkRequest(QUrl(self.__download_url))
 
     def download(self, dest_dir):
-        Log("Download plugin with url: %s" % self.__download_url, u'info' )
+        # Log("Download plugin with url: %s" % self.__download_url, u'info' )
 
         self.loop = QEventLoop()
         self.__net_request = QNetworkRequest(QUrl(self.__download_url))
@@ -435,17 +443,18 @@ class PluginDownloader(QObject):
                                 dest_dir,
                                 download_file)
 
-        Log("Download plugin to file: %s" % download_file, u'info')
+        # Log("Download plugin to file: %s" % download_file, u'info')
 
         with open(download_file, 'wb') as f:
             f.write(self.__replay.readAll())
 
-        self.unzip(download_file, dest_dir)
+        pl_name = self.unzip(download_file, dest_dir)
 
         os.remove(download_file)
 
-        return True
+        return pl_name
 
     def unzip(self, source_filename, dest_dir):
         with zipfile.ZipFile(source_filename) as zf:
             zf.extractall(dest_dir)
+            return zf.namelist()[0].strip('/')
