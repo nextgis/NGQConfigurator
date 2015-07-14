@@ -21,10 +21,7 @@ class Downloader(QDialog):
 
         self.url = QUrl(url)
 
-        self.jenkins_url = unicode(settings.value("jenkins_url", "", type = QString))
-        #self.jenkins_user_name = unicode(settings.value("jenkins_user_name", "", type = QString))
-        #self.jenkins_user_pass = unicode(settings.value("jenkins_user_pass", "", type = QString))
-        #self.jenkins_job_name = unicode(settings.value("jenkins_job_name", "", type = QString))
+        self.jenkins_url = QApplication.instance().buid_system_path
         self.jenkins_user_name = QApplication.instance().buid_system_user
         self.jenkins_user_pass = QApplication.instance().buid_system_password
         self.jenkins_job_name = QApplication.instance().buid_system_proj_name
@@ -104,7 +101,7 @@ class BuildInfoWidget(QWidget):
         self.build_number = build.getNumber()
         settings = QSettings()
 
-        self.jenkins_url = unicode(settings.value("jenkins_url", "", type = QString))
+        self.jenkins_url = QApplication.instance().buid_system_path
         self.jenkins_user_name = QApplication.instance().buid_system_user
         self.jenkins_user_pass = QApplication.instance().buid_system_password
         self.jenkins_job_name = QApplication.instance().buid_system_proj_name

@@ -356,7 +356,9 @@ class ConfigArchiveMaker(QObject):
                 self.progress.emit(self.__progress[0], self.__progress[1])
 
             settings_file = open(os.path.join(self.__archive_prepare_dir,"settings.txt"), 'w')
-            settings_file.write( json.dumps(configuration) )
+            data = json.dumps(configuration)
+            print "data: ", data
+            # settings_file.write()
             settings_file.close()
 
             self.__zipping()
@@ -364,7 +366,7 @@ class ConfigArchiveMaker(QObject):
             self.__progress[0] += 1
             self.progress.emit(self.__progress[0], self.__progress[1])
 
-            #shutil.rmtree(settings_dir, True)
+            # shutil.rmtree(settings_dir, True)
             self.finished.emit()
 
         def __optionPrepareError(self, unicode):
@@ -433,7 +435,7 @@ class PluginDownloader(QObject):
                                 dest_dir,
                                 download_file)
 
-        Log("Download plugin to file: %s" % download_file, u'info' )
+        Log("Download plugin to file: %s" % download_file, u'info')
 
         with open(download_file, 'wb') as f:
             f.write(self.__replay.readAll())

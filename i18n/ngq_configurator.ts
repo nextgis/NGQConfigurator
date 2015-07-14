@@ -54,12 +54,12 @@
 <context>
     <name>BuildInfoWidget</name>
     <message>
-        <location filename="build_info.py" line="115"/>
+        <location filename="build_info.py" line="112"/>
         <source># %1<byte value="x9"/>%2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="build_info.py" line="128"/>
+        <location filename="build_info.py" line="125"/>
         <source>Build time</source>
         <translation>Время сборки</translation>
     </message>
@@ -72,37 +72,37 @@
         <translation type="obsolete"># %1 - Идет сборка</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="149"/>
+        <location filename="build_info.py" line="146"/>
         <source>loading</source>
         <translation>загрузка</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="161"/>
+        <location filename="build_info.py" line="158"/>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="163"/>
+        <location filename="build_info.py" line="160"/>
         <source>minutes</source>
         <translation>минут(ы)</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="165"/>
+        <location filename="build_info.py" line="162"/>
         <source>Start time</source>
         <translation>Время начала</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="165"/>
+        <location filename="build_info.py" line="162"/>
         <source>Estimated end time</source>
         <translation>Ожидаемое время завершения</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="165"/>
+        <location filename="build_info.py" line="162"/>
         <source>Time to end</source>
         <translation>Время до завершения</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="146"/>
+        <location filename="build_info.py" line="143"/>
         <source>Building</source>
         <translation>Идет сборка</translation>
     </message>
@@ -130,7 +130,7 @@
         <translation>Конфигурационный архив NGQ (*.ngqca)</translation>
     </message>
     <message>
-        <location filename="ngq_builds_manager.py" line="196"/>
+        <location filename="ngq_builds_manager.py" line="197"/>
         <source>Set job...</source>
         <translation>Установка сборки</translation>
     </message>
@@ -140,7 +140,7 @@
         <translation type="obsolete">Установка сборки провалилась</translation>
     </message>
     <message>
-        <location filename="ngq_builds_manager.py" line="207"/>
+        <location filename="ngq_builds_manager.py" line="208"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -282,12 +282,12 @@
 <context>
     <name>Downloader</name>
     <message>
-        <location filename="build_info.py" line="53"/>
+        <location filename="build_info.py" line="50"/>
         <source>Save artifact</source>
         <translation>Сохранить артифакт</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="70"/>
+        <location filename="build_info.py" line="67"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -431,17 +431,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>InQueueBuildInfoWidget</name>
     <message>
-        <location filename="build_info.py" line="180"/>
+        <location filename="build_info.py" line="177"/>
         <source># %1 - In queue</source>
         <translation># %1 - В очереди</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="182"/>
+        <location filename="build_info.py" line="179"/>
         <source>loading</source>
         <translation>загрузка</translation>
     </message>
     <message>
-        <location filename="build_info.py" line="187"/>
+        <location filename="build_info.py" line="184"/>
         <source>Waiting status: %1</source>
         <translation>Статус ожидания: %1</translation>
     </message>

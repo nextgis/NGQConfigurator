@@ -32,9 +32,9 @@ class ConnectionSettingsDialog(QDialog, Ui_Dialog):
         self.label_3.setVisible(False)
         self.leJobName.setVisible(False)
 
-        settings = QSettings()
-        self.leJenkinsURL.setText(
-            settings.value("jenkins_url", "", type=unicode))
+        #settings = QSettings()
+        #self.leJenkinsURL.setText(
+        #    settings.value("jenkins_url", "", type=unicode))
         # self.leUserName.setText(
         #   settings.value("jenkins_user_name", "", type = unicode))
         # self.lePassword.setText(
@@ -45,7 +45,7 @@ class ConnectionSettingsDialog(QDialog, Ui_Dialog):
 
     def accept(self):
         settings = QSettings()
-        settings.setValue("jenkins_url", self.leJenkinsURL.text())
+        #settings.setValue("jenkins_url", self.leJenkinsURL.text())
         # settings.setValue("jenkins_user_name", self.leUserName.text())
         # settings.setValue("jenkins_user_pass", self.lePassword.text())
         # settings.setValue("jenkins_job_name", self.leJobName.text())
@@ -167,7 +167,8 @@ class BuildsManagerMain(QMainWindow, Ui_MainWindow):
                                                 configuration_file_archive,
                                                 self.tr("NGQ configuration archive (*.ngqca)")
                                                 )
-            fileName = unicode(fileName)
+
+            fileName = unicode(fileName.toUtf8(), encoding="UTF-8")
 
             if fileName != "":
                 settings.setValue(u'configuration_file_archive', fileName)

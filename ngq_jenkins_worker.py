@@ -12,6 +12,7 @@ from logger import Log
 from post_helper import encode_parameters
 from ngq_builds_manager_model import BuildSystemModel, Build
 
+
 class JenkinsJobSetter(QObject):
     started = pyqtSignal(unicode)
     finished = pyqtSignal()
@@ -22,21 +23,27 @@ class JenkinsJobSetter(QObject):
         self.__config_archive = config_archive
 
     def start(self):
-        settings = QSettings()
-        jenkins_url = unicode(settings.value("jenkins_url", "", type = QString)).encode('utf-8')
-        #jenkins_user_name = unicode(settings.value("jenkins_user_name", "", type = QString)).encode('utf-8')
-        #jenkins_user_pass = unicode(settings.value("jenkins_user_pass", "", type = QString)).encode('utf-8')
-        #jenkins_job_name = unicode(settings.value("jenkins_job_name", "", type = QString)).encode('utf-8')
+        # settings = QSettings()
+        # jenkins_url = unicode(settings.value("jenkins_url", "", type = QString)).encode('utf-8')
+        # jenkins_user_name = unicode(settings.value("jenkins_user_name", "", type = QString)).encode('utf-8')
+        # jenkins_user_pass = unicode(settings.value("jenkins_user_pass", "", type = QString)).encode('utf-8')
+        # jenkins_job_name = unicode(settings.value("jenkins_job_name", "", type = QString)).encode('utf-8')
+        jenkins_url = QApplication.instance().buid_system_path.encode('utf-8')
         jenkins_user_name = QApplication.instance().buid_system_user.encode('utf-8')
         jenkins_user_pass = QApplication.instance().buid_system_password.encode('utf-8')
         jenkins_job_name = QApplication.instance().buid_system_proj_name.encode('utf-8')
 
-        self.started.emit("Seting job with name %s"%jenkins_job_name)
-        try:
-            j = jenkins.Jenkins(jenkins_url, jenkins_user_name, jenkins_user_pass)
-            url = jenkins_url + "/" + jenkins.BUILD_WITH_PARAMS_JOB%{"name":jenkins_job_name}
+        self.started.emit("Seting job with name %s" % jenkins_job_name)
 
-            values = {'settings.zip' : open( str(self.__config_archive), 'rb')}
+        try:
+            j = jenkins.Jenkins(
+                        jenkins_url,
+                        jenkins_user_name,
+                        jenkins_user_pass)
+
+            url = jenkins_url + "/" + jenkins.BUILD_WITH_PARAMS_JOB % {"name":jenkins_job_name}
+
+            values = {'settings.zip': open(str(self.__config_archive), 'rb')}
             datagen, headers = encode_parameters(values)
 
             req = jenkins.Request( url, datagen, headers )
