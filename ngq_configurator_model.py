@@ -5,6 +5,7 @@ import json
 import shutil
 import tempfile
 import zipfile
+import traceback
 
 from PyQt4.QtCore import *
 from PyQt4.QtNetwork import *
@@ -64,7 +65,16 @@ class CustomizationOption(QObject):
             return self._asDict()
 
     def prepareForArchive(self, archive_root_dir):
-        return self._prepareForArchive(archive_root_dir)
+        Log("Prepare option {0} ({1})".format(self.getName(), self.__class__.__name__), u'debug')
+        try:
+            res = self._prepareForArchive(archive_root_dir)
+            Log("Prepare res: {0}".format(res), u'debug')
+            return res
+        except:
+            trace = traceback.format_exc()
+            Log("Prepare option FAIL:\n{0}".format(trace), u'error')
+            self.prepareForArchiveError.emit(trace)
+            return {}
 
     def resetFromJson(self, configuration):
         if configuration.has_key(self.__name):
@@ -85,37 +95,43 @@ class StringCustomizationOption(CustomizationOption):
     def _prepareForArchive(self, archive_root_dir):
         self.prepareForArchiveProcess.emit(0, 0)
 
-        if self.value is None:
-            return {}
+        res = {}
 
-        return {self.getName(): self.value}
+        if self.value is not None:
+            res = {self.getName(): self.value}
+
+        return res
 
 
 class FileCustomizationOption(CustomizationOption):
     def __init__(self, name, parent=None, **kwargs):
         CustomizationOption.__init__(self, name, parent, **kwargs)
 
+    def _asDict(self):
+        return {self.getName(): self.value}
+
     def _prepareForArchive(self, archive_root_dir):
-        self.prepareForArchiveProcess.emit(0, 0)
+        self.prepareForArchiveProcess.emit(0, 1)
+
         if self.value is None:
+            self.prepareForArchiveProcess.emit(1, 1)
             return {}
 
         if QFileInfo(self.value).isFile():
             file_base_name = os.path.basename(self.value)
-            shutil.copyfile(
-                    self.value,
-                    os.path.join(archive_root_dir, file_base_name))
+            shutil.copyfile(self.value,
+                            os.path.join(archive_root_dir, file_base_name))
 
+            self.prepareForArchiveProcess.emit(1, 1)
             return {self.getName(): file_base_name}
         else:
             dir_base_name = os.path.basename(self.value)
             shutil.copytree(
                 self.value,
                 os.path.join(archive_root_dir, dir_base_name))
-            return {self.getName(): dir_base_name}
 
-    def _asDict(self):
-        return {self.getName(): self.value}
+            self.prepareForArchiveProcess.emit(1, 1)
+            return {self.getName(): dir_base_name}
 
 
 class QGISOptionsOption(CustomizationOption):
@@ -124,9 +140,12 @@ class QGISOptionsOption(CustomizationOption):
     """
     def __init__(self, parent=None, **kwargs):
         CustomizationOption.__init__(
-                self,
-                u"default_qgis_options_dirs",
-                parent, **kwargs)
+            self,
+            u"default_qgis_options_dirs",
+            parent, **kwargs)
+
+    def _asDict(self):
+        return {self.getName(): self.value}
 
     def _prepareForArchive(self, archive_root_dir):
         configuration = {}
@@ -134,29 +153,29 @@ class QGISOptionsOption(CustomizationOption):
             return {}
 
         for opt_set_name in self.value.keys():
-            shutil.copytree(
-                    self.value[opt_set_name],
-                    os.path.join(
-                        archive_root_dir,
-                        opt_set_name + "-" + os.path.basename(
-                            self.value[opt_set_name])))
+            Log("QGIS options name: {0}".format(opt_set_name), u'debug')
 
-            configuration[opt_set_name] = "{0}-{1}".format(
-                       opt_set_name,
-                       os.path.basename(self.value[opt_set_name]))
+            qgis_options_dir_name = "{0}-{1}".format(opt_set_name,
+                                                     os.path.basename(self.value[opt_set_name]))
+
+            Log("QGIS options dir name: {0}".format(qgis_options_dir_name), u'debug')
+
+            shutil.copytree(self.value[opt_set_name],
+                            os.path.join(archive_root_dir, qgis_options_dir_name))
+
+            configuration[opt_set_name] = qgis_options_dir_name
 
         return {self.getName(): configuration}
-
-    def _asDict(self):
-        return {self.getName(): self.value}
 
 
 class PluginsCustomizationOption(CustomizationOption):
     def __init__(self, name, parent=None, **kwargs):
         CustomizationOption.__init__(self, name, parent, **kwargs)
 
-    def _prepareForArchive(self, archive_root_dir):
+    def _asDict(self):
+        return {self.getName(): self.value}
 
+    def _prepareForArchive(self, archive_root_dir):
         if self.value is None:
             return {self.getName(): []}
 
@@ -168,27 +187,32 @@ class PluginsCustomizationOption(CustomizationOption):
         counter = 0
 
         for plugin in self.value:
+            Log("Plugin name: {0}".format(plugin[u'name']), u'debug')
 
-            Log("Prepare plugin: %s" % plugin[u'name'], u'info' )
+            get_plugin_fail = False
 
-            download_fail = False
             if plugin[u'type'] == 0:
+                Log("Copy plugin from local PC: {0} START".format(os.path.join(plugin[u'dest'], plugin[u'name'])), u'debug')
+
                 shutil.copytree(
                     os.path.join(plugin[u'dest'], plugin[u'name']),
                     os.path.join(plugins_dir, plugin[u'name']))
 
+                Log("Copy plugin from local PC FINISH", u'debug')
             elif plugin[u'type'] == 1:
-                Log("Download plugin from %s" % plugin[u'dest'], u'info' )
+                Log("Download plugin from: {0} START".format(plugin[u'dest']), u'debug')
+
                 self.pd = PluginDownloader(plugin[u'dest'])
                 pl_name = self.pd.download(plugins_dir)
+
                 if pl_name is None:
-                    download_fail = True
+                    get_plugin_fail = True
+                    Log("Download plugin FAIL", u'error')
                 else:
                     plugin[u'name'] = pl_name
+                    Log("Download plugin with name: {0} FINISH".format(plugin[u'name']), u'debug')
 
-                Log("Download plugin name %s" % plugin[u'name'], u'info' )
-
-            if not download_fail:
+            if not get_plugin_fail:
                 configuration.append({u'name': plugin[u'name']})
 
             counter += 1
@@ -196,13 +220,13 @@ class PluginsCustomizationOption(CustomizationOption):
 
         return {self.getName(): configuration}
 
-    def _asDict(self):
-        return {self.getName(): self.value}
-
 
 class AboutPagesCustomizationOption(CustomizationOption):
     def __init__(self, name, parent=None, **kwargs):
         CustomizationOption.__init__(self, name, parent, **kwargs)
+
+    def _asDict(self):
+        return {self.getName(): self.value}
 
     def _prepareForArchive(self, archive_root_dir):
         if self.value is None:
@@ -218,12 +242,13 @@ class AboutPagesCustomizationOption(CustomizationOption):
             configuration.append(page)
 
             if page.has_key(u'content_file'):
+                Log("New page name: {0}".format(page[u'name'][0]), u'debug')
+                Log("New page content: {0}".format(page[u'content_file']), u'debug')
+
                 src_file = open(page[u'content_file'], "r")
-                dst_file = open(
-                            os.path.join(
-                                files_dir,
-                                os.path.basename(page[u'content_file'])),
-                            "w")
+                dst_file = open(os.path.join(files_dir,
+                                             os.path.basename(page[u'content_file'])),
+                                "w")
 
                 for src_line in src_file:
                     dst_line = src_line
@@ -250,11 +275,7 @@ class AboutPagesCustomizationOption(CustomizationOption):
                 configuration[counter][u'content_file'] = os.path.basename(page[u'content_file'])
 
             counter += 1
-
         return {self.getName(): configuration}
-
-    def _asDict(self):
-        return {self.getName(): self.value}
 
 
 class NGQConfiguratorModel(QObject):
@@ -269,22 +290,25 @@ class NGQConfiguratorModel(QObject):
         self.__options = []
 
     def addOption(self, option):
-        #Check for same name
+        Log("Add option: %s" % option.getName(), u'info')
         self.__options.append(option)
 
     def saveAsLocalSettings(self, filename):
-        Log("Save as local settings: %s"%filename, u'debug' )
+        Log("Save as local settings in %s START" % filename, u'info')
 
         configuration = {}
         for option in self.__options:
-            configuration.update( option.asDict() )
+            configuration.update(option.asDict())
 
         file = QFile(filename)
         file.open(QIODevice.WriteOnly | QIODevice.Text)
 
-        file.write( json.dumps(configuration, ensure_ascii=False).encode('utf8') )
+        json_str = json.dumps(configuration, ensure_ascii=False, indent=4).encode('utf8')
+        file.write(json_str)
 
         file.close()
+
+        Log("Save as local settings in %s FINISH" % filename, u'info')
 
     def saveAsArchive(self, filename):
         self.saveArchiveProgressStarted.emit()
@@ -297,14 +321,16 @@ class NGQConfiguratorModel(QObject):
         self.w.finished.connect(self.saveArchiveProgressFinished.emit)
         self.w.progress.connect(self.saveArchiveTotalProgress.emit)
         self.w.subProgress.connect(self.saveArchiveSubProgress.emit)
+        self.w.errorOcured.connect(self.t.quit)
+        self.w.errorOcured.connect(self.saveArchiveProgressError)
 
         self.t.start()
 
     def loadFromLocalSettings(self, filename):
-        Log("Load from local settings: %s"%filename, u'debug' )
+        Log("Load local settings from %s START" % filename, u'info')
 
         if not os.path.exists(filename):
-            Log("Load from local settings: %s"%filename, u'error' )
+            Log("Load from local settings: %s" % filename, u'error')
             return
 
         with open(filename, 'r') as f:
@@ -314,12 +340,16 @@ class NGQConfiguratorModel(QObject):
                 configuration = json.loads(data)
 
                 for option in self.__options:
+                    Log("Reset option {0} from json START".format(option.getName()), u'debug')
                     option.resetFromJson(configuration)
+                    Log("Reset option {0} from json FINISH".format(option.getName()), u'debug')
 
-            except ValueError:
-                pass
+            except ValueError as err:
+                Log("Reset option from {0}: {1}".format(filename, err), u'error')
 
-    def loadFromArchive(self,filename):
+        Log("Load local settings from %s FINISH" % filename, u'info')
+
+    def loadFromArchive(self, filename):
         pass
 
     def reset(self):
@@ -338,36 +368,37 @@ class ConfigArchiveMaker(QObject):
         def __init__(self, archive_name, options, parent=None):
             QObject.__init__(self, parent)
             self.__archive_name = archive_name
-            self.__archive_prepare_dir = tempfile.mkdtemp('','ngq_configurator_result_')
+            self.__archive_prepare_dir = tempfile.mkdtemp('', 'ngq_configurator_result_')
 
             self.__options = options
 
             self.__progress = [0, len(options)]
-            self.__progress[1] += 1 # for zipping process
+            self.__progress[1] += 1  # for zipping process
 
             self.__must_stop = False
 
         def run(self):
+            Log("Prepare configuration archive: {0} START".format(self.__archive_name), u'info')
             self.started.emit()
             self.progress.emit(self.__progress[0], self.__progress[1])
 
             configuration = {}
 
             for option in self.__options:
-
-                if self.__must_stop == True:
+                if self.__must_stop is True:
                     return
 
                 option.prepareForArchiveProcess.connect(self.subProgress.emit)
                 option.prepareForArchiveError.connect(self.__optionPrepareError)
+
                 configuration.update(option.prepareForArchive(self.__archive_prepare_dir))
 
                 self.__progress[0] += 1
                 self.progress.emit(self.__progress[0], self.__progress[1])
 
-            settings_file = open(os.path.join(self.__archive_prepare_dir,"settings.txt"), 'w')
-            data = json.dumps(configuration)
-            settings_file.write(data)
+            settings_file = open(os.path.join(self.__archive_prepare_dir, "settings.txt"), 'w')
+            json_str = json.dumps(configuration, ensure_ascii=False, indent=4).encode('utf8')
+            settings_file.write(json_str)
             settings_file.close()
 
             self.__zipping()
@@ -377,9 +408,10 @@ class ConfigArchiveMaker(QObject):
 
             # shutil.rmtree(settings_dir, True)
             self.finished.emit()
+            Log("Prepare configuration archive: {0} FINISH".format(self.__archive_name), u'info')
 
-        def __optionPrepareError(self, unicode):
-            self.errorOcured.emit()
+        def __optionPrepareError(self, trace):
+            self.errorOcured.emit(trace)
             self.__must_stop = True
 
         def stop(self):
@@ -389,13 +421,13 @@ class ConfigArchiveMaker(QObject):
             total_files_count = 0
             for root, dirs, files in os.walk(self.__archive_prepare_dir):
                 for file in files:
-                    total_files_count +=1
+                    total_files_count += 1
 
             def zipdir(path, zip):
                 files_counter = 0
                 for root, dirs, files in os.walk(path):
                     for file in files:
-                        zip.write(os.path.join(root, file), os.path.join( os.path.relpath(root, path), file) )
+                        zip.write(os.path.join(root, file), os.path.join(os.path.relpath(root, path), file))
                         self.subProgress.emit(files_counter, total_files_count)
                         files_counter += 1
 
@@ -431,17 +463,15 @@ class PluginDownloader(QObject):
         if self.__download_url.split('/')[-1] != "":
             download_file = self.__download_url.split('/')[-1]
         else:
-            content_desp = unicode(
-                    QString(self.__replay.rawHeader('Content-Disposition')),
-                    encoding="UTF-8") + ";"
-            print "content_desp: ", content_desp
+            content_desp = unicode(QString(self.__replay.rawHeader('Content-Disposition')),
+                                   encoding="UTF-8") + ";"
+
             m = re.search("filename=.*;", content_desp)
             if m is not None:
                 download_file = m.group()[9:-1]
 
-        download_file = os.path.join(
-                                dest_dir,
-                                download_file)
+        download_file = os.path.join(dest_dir,
+                                     download_file)
 
         # Log("Download plugin to file: %s" % download_file, u'info')
 

@@ -6,7 +6,7 @@ RequestExecutionLevel admin
 !define SRC "..\dist"
 !define PROGRAM_NAME "NGQ Configurator"
 !define INSTALLER_NAME "ngq_configurator_setup"
-!define PROGRAM_VERSION "0.0.6"
+!define PROGRAM_VERSION "0.1.1"
 !define UNINSTALLER_NAME "uninstall.exe"
 !define CONFIGURATOR_RUN_LNK_NAME "NGQ Configurator"
 !define BUILD_MANAGER_RUN_LNK_NAME "Build manager"
@@ -18,7 +18,7 @@ InstallDir "$PROGRAMFILES\NGQConfigurator"
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
 !include "utils.nsh"
-!include "FileAssociation.nsh"
+!include "FileAssoc.nsh"
 
 ShowInstDetails show
 ShowUnInstDetails show
@@ -40,7 +40,6 @@ ShowUnInstDetails show
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_LANGUAGE "Russian"
-
 ;--------------------------------
 ;Installer Sections
 Section "NGQConfigurator" NGQConfigurator
@@ -105,7 +104,9 @@ Section "-DONE"
     CreateShortCut "$SMPROGRAMS\${PROGRAM_NAME}\Удалить ${PROGRAM_NAME}.lnk" "$INSTALL_DIR\${UNINSTALLER_NAME}" "" \
     "$INSTALL_DIR\${UNINSTALLER_NAME}" "" SW_SHOWNORMAL "" "Удалить ${PROGRAM_NAME}"
 
-    ;${registerExtension} "$INSTALL_DIR\ngq_configurator.exe" ".ngqc" "NGQ_Configuration_File"
+    !insertmacro APP_ASSOCIATE "ngqc" "ngqc.config" "NGQ configuration" "$INSTALL_DIR\icons\ng.ico" "Open with ${PROGRAM_NAME}" \ 
+    "$\"$INSTALL_DIR\ngq_configurator.exe$\" --load_conf $\"%1$\""
+    !insertmacro UPDATEFILEASSOC
 SectionEnd
 
 Function .onInit
@@ -157,5 +158,6 @@ Section "Uninstall"
 	DeleteRegKey HKLM "Software\${PROGRAM_NAME}"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}"
 
-    ;${unregisterExtension} ".ngqc" "NGQ_Configuration_File"
+    !insertmacro APP_UNASSOCIATE "ngqc" "ngqc.config"
+    !insertmacro UPDATEFILEASSOC
 SectionEnd

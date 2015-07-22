@@ -2,6 +2,7 @@
 import os
 import sys
 import logging
+from logging.handlers import RotatingFileHandler
 import traceback
 
 from PyQt4 import QtGui, QtCore
@@ -134,6 +135,7 @@ class QGISRepoSettings(QDialog, Ui_RepoSettingsDialog):
 
         QDialog.accept(self)
 
+
 class QGISReposDialog(QDialog, Ui_QGISReposDialog):
     def __init__(self, parent = None):
         QDialog.__init__(self, parent)
@@ -184,42 +186,50 @@ class QGISReposDialog(QDialog, Ui_QGISReposDialog):
         self.pbDelRepo.setEnabled(True)
         self.pbEditRepo.setEnabled(True)
 
+
 class NGQConfigurator(QMainWindow, Ui_NGQConfigurator):
-    def __init__(self, parent=None):
+    def __init__(self, load_conf, parent=None):
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
 
-        self.setWindowIcon( QIcon(":/NGQConfigurator/icons/ng.ico") )
+        self.setWindowIcon(QIcon(":/NGQConfigurator/icons/ng.ico"))
 
         self.menuHelp.addAction(QWhatsThis.createAction(self))
 
         self.actionSave.triggered.connect(self.saveLocalConfiguration)
-        self.actionSave.setShortcut( QKeySequence("Ctrl+S") )
+        self.actionSave.setShortcut(QKeySequence("Ctrl+S"))
         settings = QSettings()
-        configuration_file = settings.value(u'configuration_file', defaultValue = unicode(), type=unicode)
+        configuration_file = settings.value(u'configuration_file', defaultValue=unicode(), type=unicode)
         if configuration_file.isEmpty():
             self.actionSave.setEnabled(False)
 
-        self.actionSaveAs.triggered.connect(self.saveAsLocalConfiguration)
+        self.actionOpen.setShortcut(QKeySequence("Ctrl+O"))
         self.actionOpen.triggered.connect(self.openLocalConfiguration)
+
+        self.actionSaveAs.triggered.connect(self.saveAsLocalConfiguration)
         self.actionImport.triggered.connect(self.importConfigurationFromArchive)
+
+        self.actionExport.setShortcut(QKeySequence("Ctrl+E"))
         self.actionExport.triggered.connect(self.exportConfigurationToArchive)
+
         self.actionNew.triggered.connect(self.resetModel)
 
         self.actionQGIS_repositories.triggered.connect(self.editQGISrepos)
 
         self._model = NGQConfiguratorModel(self)
-        self.__conf_pack_maker_dialog_ext = ConfigPackageMakerDialog(self)
-        self._model.saveArchiveProgressStarted.connect(self.__conf_pack_maker_dialog_ext.show)
-        self._model.saveArchiveProgressFinished.connect(self.__conf_pack_maker_dialog_ext.hide)
-        self._model.saveArchiveProgressFinished.connect(self.__conf_pack_maker_dialog_ext.close)
-        self._model.saveArchiveTotalProgress.connect(self.__conf_pack_maker_dialog_ext.totalProgressHandel)
-        self._model.saveArchiveSubProgress.connect(self.__conf_pack_maker_dialog_ext.subProgressHandel)
+        self.__conf_pack_maker_dialog = ConfigPackageMakerDialog(self)
+        self._model.saveArchiveProgressStarted.connect(self.__conf_pack_maker_dialog.show)
+        self._model.saveArchiveProgressFinished.connect(self.__conf_pack_maker_dialog.hide)
+        self._model.saveArchiveProgressFinished.connect(self.__conf_pack_maker_dialog.close)
+        self._model.saveArchiveTotalProgress.connect(self.__conf_pack_maker_dialog.totalProgressHandel)
+        self._model.saveArchiveSubProgress.connect(self.__conf_pack_maker_dialog.subProgressHandel)
+        self._model.saveArchiveProgressError.connect(self.__conf_pack_maker_dialog.close)
+        self._model.saveArchiveProgressError.connect(self.__show_error)
 
         self.common_options_container.setAlignment(Qt.AlignTop)
         self.advanced_options_container.setAlignment(Qt.AlignTop)
 
-        prog_name_option = StringCustomizationOption(u'prog_name', default_value = u'Super GIS')
+        prog_name_option = StringCustomizationOption(u'prog_name', default_value=u'Super GIS')
         self._model.addOption(prog_name_option)
         prog_name_view = StringOption(prog_name_option, self.tr(u'Program name'), self)
         prog_name_view.setToolTip(self.tr(u'Only Latin characters!'))
@@ -229,67 +239,67 @@ class NGQConfigurator(QMainWindow, Ui_NGQConfigurator):
 
         ngq_icon_option = FileCustomizationOption(u'ngq_icon')
         self._model.addOption(ngq_icon_option)
-        ngq_icon_view = ImageOption(ngq_icon_option, u'%s (only ico format)'%self.tr(u'NGQ Icon'), self)
-        ngq_icon_view.setFilter("%s %s"%(self.tr(u'Image'), u'(*.ico)'))
+        ngq_icon_view = ImageOption(ngq_icon_option, u'%s (only ico format)' % self.tr(u'NGQ Icon'), self)
+        ngq_icon_view.setFilter("%s %s" % (self.tr(u'Image'), u'(*.ico)'))
         self.common_options_container.addWidget(ngq_icon_view)
 
         ngq_icon_x_16_option = FileCustomizationOption(u'ngq_icon_png_16')
         self._model.addOption(ngq_icon_x_16_option)
-        ngq_icon_x_16_view = ImageOption(ngq_icon_x_16_option, u'%s x16 (only png format)'%self.tr(u'NGQ Icon'), self)
-        ngq_icon_x_16_view.setFilter("%s %s"%(self.tr(u'Image'), u'(*.png)'))
+        ngq_icon_x_16_view = ImageOption(ngq_icon_x_16_option, u'%s x16 (only png format)' % self.tr(u'NGQ Icon'), self)
+        ngq_icon_x_16_view.setFilter("%s %s" % (self.tr(u'Image'), u'(*.png)'))
         self.common_options_container.addWidget(ngq_icon_x_16_view)
 
         ngq_icon_x_64_option = FileCustomizationOption(u'ngq_icon_png_64')
         self._model.addOption(ngq_icon_x_64_option)
-        ngq_icon_x_64_view = ImageOption(ngq_icon_x_64_option, u'%s x64 (only png format)'%self.tr(u'NGQ Icon'), self)
-        ngq_icon_x_64_view.setFilter("%s %s"%(self.tr(u'Image'), u'(*.png)'))
+        ngq_icon_x_64_view = ImageOption(ngq_icon_x_64_option, u'%s x64 (only png format)' % self.tr(u'NGQ Icon'), self)
+        ngq_icon_x_64_view.setFilter("%s %s" % (self.tr(u'Image'), u'(*.png)'))
         self.common_options_container.addWidget(ngq_icon_x_64_view)
 
         ngq_icon_svg_option = FileCustomizationOption(u'ngq_icon_svg')
         self._model.addOption(ngq_icon_svg_option)
-        ngq_icon_svg_view = ImageOption(ngq_icon_svg_option, u'%s (only svg format)'%self.tr(u'NGQ Icon'), self)
-        ngq_icon_svg_view.setFilter("%s %s"%(self.tr(u'Image'), u'(*.svg)'))
+        ngq_icon_svg_view = ImageOption(ngq_icon_svg_option, u'%s (only svg format)' % self.tr(u'NGQ Icon'), self)
+        ngq_icon_svg_view.setFilter("%s %s" % (self.tr(u'Image'), u'(*.svg)'))
         self.common_options_container.addWidget(ngq_icon_svg_view)
 
         ngq_splash_option = FileCustomizationOption(u'ngq_splash')
         self._model.addOption(ngq_splash_option)
-        ngq_splash_view = ImageOption(ngq_splash_option, u'%s (only png format)'%self.tr(u'NGQ Splash'), self)
-        ngq_splash_view.setFilter("%s %s"%(self.tr(u'Image'), u'(*.png)'))
+        ngq_splash_view = ImageOption(ngq_splash_option, u'%s (only png format)' % self.tr(u'NGQ Splash'), self)
+        ngq_splash_view.setFilter("%s %s" % (self.tr(u'Image'), u'(*.png)'))
         self.common_options_container.addWidget(ngq_splash_view)
 
         installer_name_option = StringCustomizationOption(
-                u'installer_name',
-                default_value = (prog_name_option, lambda option: '_'.join(option.value.lower().split(' ')))
+            u'installer_name',
+            default_value=(prog_name_option, lambda option: '_'.join(option.value.lower().split(' ')))
         )
         self._model.addOption(installer_name_option)
         installer_name_view = StringOption(installer_name_option, self.tr(u'Installer name'), self)
-        #installer_name_view.setToolTip(self.tr(u'Only Latin characters!'))
-        #installer_name_view.setStatusTip(self.tr(u'Only Latin characters!'))
+        # installer_name_view.setToolTip(self.tr(u'Only Latin characters!'))
+        # installer_name_view.setStatusTip(self.tr(u'Only Latin characters!'))
         installer_name_view.setWhatsThis(self.tr(u'Only Latin characters!'))
         self.advanced_options_container.addWidget(installer_name_view)
 
         run_link_name_option = StringCustomizationOption(
-                u'ngq_shortcut_name',
-                default_value = (prog_name_option, lambda option: option.value.upper())
+            u'ngq_shortcut_name',
+            default_value=(prog_name_option, lambda option: option.value.upper())
         )
         self._model.addOption(run_link_name_option)
         run_link_name_view = StringOption(run_link_name_option, self.tr(u'Run shortcut name'), self)
         self.advanced_options_container.addWidget(run_link_name_view)
 
         ngq_title_en_option = StringCustomizationOption(
-                u'ngq_title_en',
-                default_value = u'GIS \'NextGIS QGIS\''
+            u'ngq_title_en',
+            default_value=u'GIS \'NextGIS QGIS\''
         )
         self._model.addOption(ngq_title_en_option)
         ngq_title_en_view = StringOption(ngq_title_en_option, self.tr(u'NGQ Title eng'), self)
-        #ngq_title_en_view.setToolTip(self.tr(u'Only Latin characters!'))
-        #ngq_title_en_view.setStatusTip(self.tr(u'Only Latin characters!'))
+        # ngq_title_en_view.setToolTip(self.tr(u'Only Latin characters!'))
+        # ngq_title_en_view.setStatusTip(self.tr(u'Only Latin characters!'))
         ngq_title_en_view.setWhatsThis(self.tr(u'Only Latin characters!'))
         self.advanced_options_container.addWidget(ngq_title_en_view)
 
         ngq_title_ru_option = StringCustomizationOption(
-                u'ngq_title_tr',
-                default_value = u'ГИС \'NextGIS QGIS\''
+            u'ngq_title_tr',
+            default_value=u'ГИС \'NextGIS QGIS\''
         )
         self._model.addOption(ngq_title_ru_option)
         ngq_title_ru_view = StringOption(ngq_title_ru_option, self.tr(u'NGQ Title tr'), self)
@@ -299,7 +309,7 @@ class NGQConfigurator(QMainWindow, Ui_NGQConfigurator):
         self._model.addOption(default_proj_option)
         default_proj_view = FileOption(default_proj_option, self.tr(u'Default project'))
         default_proj_view.setFilter(
-                "%s %s" % (self.tr(u'QGIS Project'), u'(*.qgs)'))
+            "%s %s" % (self.tr(u'QGIS Project'), u'(*.qgs)'))
         self.advanced_options_container.addWidget(default_proj_view)
 
         default_qgis_opts_option = QGISOptionsOption()
@@ -318,34 +328,42 @@ class NGQConfigurator(QMainWindow, Ui_NGQConfigurator):
         self.about_pages_container.addWidget(ngq_about_pages_view)
 
         settings = QSettings()
-        configuration_file = settings.value(u'configuration_file', defaultValue = QString(), type=QString)
+        if load_conf is not None:
+            configuration_file = load_conf
+            settings.setValue(u'configuration_file', load_conf)
+
+        configuration_file = settings.value(u'configuration_file', defaultValue=QString(), type=QString)
 
         if QFileInfo(configuration_file).exists():
             self._model.loadFromLocalSettings(configuration_file)
+
+    def __show_error(self, trace):
+        trace = unicode(trace.toUtf8(), encoding="UTF-8")
+        last_line = trace.splitlines()[-1]
+        MessageDialog.critical(self, self.tr("Error"), last_line, trace)
 
     def resetModel(self):
         self._model.reset()
 
     def saveLocalConfiguration(self):
         settings = QSettings()
-        configuration_file = settings.value(u'configuration_file', defaultValue = unicode(), type=unicode)
+        configuration_file = settings.value(u'configuration_file', defaultValue=unicode(), type=unicode)
         self._model.saveAsLocalSettings(configuration_file)
 
     def saveAsLocalConfiguration(self):
         try:
             settings = QSettings()
-            configuration_file = settings.value(u'configuration_file', defaultValue = unicode(), type=unicode)
+            configuration_file = settings.value(u'configuration_file', defaultValue=unicode(), type=unicode)
             fileName = QFileDialog.getSaveFileName(self,
-                                                self.tr("Save configuration file"),
-                                                configuration_file,
-                                                self.tr("NGQ configuration file (*.ngqc)")
-                                                )
+                                                   self.tr("Save configuration file"),
+                                                   configuration_file,
+                                                   self.tr("NGQ configuration file (*.ngqc)"))
 
-            if fileName.isNull() == False:
+            if fileName.isNull() is False:
                 fileName = unicode(fileName.toUtf8(), encoding="UTF-8")
 
                 if os.path.splitext(fileName)[1] != u".ngqc":
-                    fileName = "%s.ngqc"%fileName
+                    fileName = "%s.ngqc" % fileName
 
                 settings.setValue(u'configuration_file', fileName)
                 if not self.actionSave.isEnabled():
@@ -361,13 +379,12 @@ class NGQConfigurator(QMainWindow, Ui_NGQConfigurator):
     def openLocalConfiguration(self):
         try:
             settings = QSettings()
-            configuration_file = settings.value(u'configuration_file', defaultValue = unicode(), type=unicode)
+            configuration_file = settings.value(u'configuration_file', defaultValue=unicode(), type=unicode)
             fileName = QFileDialog.getOpenFileName(self,
-                                                self.tr("Save configuration file"),
-                                                configuration_file,
-                                                self.tr("NGQ configuration file (*.ngqc)")
-                                                )
-            if fileName.isNull() == False:
+                                                   self.tr("Save configuration file"),
+                                                   configuration_file,
+                                                   self.tr("NGQ configuration file (*.ngqc)"))
+            if fileName.isNull() is False:
                 fileName = unicode(fileName.toUtf8(), encoding="UTF-8")
                 settings.setValue(u'configuration_file', fileName)
                 self._model.loadFromLocalSettings(fileName)
@@ -383,17 +400,16 @@ class NGQConfigurator(QMainWindow, Ui_NGQConfigurator):
     def exportConfigurationToArchive(self):
         try:
             settings = QSettings()
-            configuration_file_archive = settings.value(u'configuration_file_archive', defaultValue = unicode(), type=unicode)
+            configuration_file_archive = settings.value(u'configuration_file_archive', defaultValue=unicode(), type=unicode)
             fileName = QFileDialog.getSaveFileName(self,
-                                                self.tr("Open configuration file"),
-                                                configuration_file_archive,
-                                                self.tr("NGQ configuration archive (*.ngqca)")
-                                                )
-            if fileName.isNull() == False:
+                                                   self.tr("Open configuration file"),
+                                                   configuration_file_archive,
+                                                   self.tr("NGQ configuration archive (*.ngqca)"))
+            if fileName.isNull() is False:
                 fileName = unicode(fileName.toUtf8(), encoding="UTF-8")
 
                 if os.path.splitext(fileName)[1] != u".ngqca":
-                    fileName = "%s.ngqca"%fileName
+                    fileName = "%s.ngqca" % fileName
 
                 settings.setValue(u'configuration_file_archive', fileName)
 
@@ -407,6 +423,7 @@ class NGQConfigurator(QMainWindow, Ui_NGQConfigurator):
         dlg = QGISReposDialog()
         if dlg.exec_():
             print "Save "
+
 
 class NGQConfiguratorApp(QApplication):
     def __init__(self, args):
@@ -423,9 +440,15 @@ class NGQConfiguratorApp(QApplication):
         self.logger = logging.getLogger(unicode(self.applicationName()))
         self.logger.setLevel(logging.DEBUG)
 
-        log_file_name = "_".join(unicode(self.applicationName()).split(u" "))+"_log.txt"
+        log_file_name = "_".join(unicode(self.applicationName()).split(u" ")) + "_log.txt"
 
-        fh = logging.FileHandler(os.path.join(unicode(self.applicationDirPath()), log_file_name))
+        fh = RotatingFileHandler(
+            os.path.join(unicode(self.applicationDirPath()), log_file_name),
+            mode='a',
+            maxBytes=102400,
+            backupCount=5,
+            encoding='utf-8')
+
         fh.setLevel(logging.DEBUG)
         sh = logging.StreamHandler()
         sh.setLevel(logging.DEBUG)
@@ -435,16 +458,23 @@ class NGQConfiguratorApp(QApplication):
         sh.setFormatter(formatter)
 
         self.logger.addHandler(fh)
-        #self.logger.addHandler(sh)
 
-        #self.logger.info(os.getcwd())
-        #self.logger.info(self.applicationDirPath())
+        if "--with-consol" in args:
+            self.logger.addHandler(sh)
 
-        self.mw = NGQConfigurator()
+        load_conf = None
+        if "--load_conf" in args:
+            load_conf = args[args.index("--load_conf") + 1]
+
+        QApplication.instance().logger.info("NGQ Configurator START")
+        QApplication.instance().logger.info("args: {0}".format(args))
+        QApplication.instance().logger.info("use resources: {0}".format(resources_rc.__file__))
+        self.mw = NGQConfigurator(load_conf)
         self.mw.show()
 
 if __name__ == "__main__":
     app = NGQConfiguratorApp(sys.argv)
     res = app.exec_()
-    print "res: ", res
+    QApplication.instance().logger.info("NGQ Configurator FINISH. " +
+                                        "Exit code: {0}".format(res))
     sys.exit(res)

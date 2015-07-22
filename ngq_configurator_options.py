@@ -116,9 +116,6 @@ class ImageOption(FileOptionBase):
             self.__showImage()
 
     def __showImage(self):
-
-        Log("%s: %s"%(self.__option.getName(), self.__option.value), u'debug' )
-
         if self.__option.value is None:
             self.l_image.setText( self.tr(u'Image not selected') )
             return

@@ -23,11 +23,6 @@ class JenkinsJobSetter(QObject):
         self.__config_archive = config_archive
 
     def start(self):
-        # settings = QSettings()
-        # jenkins_url = unicode(settings.value("jenkins_url", "", type = QString)).encode('utf-8')
-        # jenkins_user_name = unicode(settings.value("jenkins_user_name", "", type = QString)).encode('utf-8')
-        # jenkins_user_pass = unicode(settings.value("jenkins_user_pass", "", type = QString)).encode('utf-8')
-        # jenkins_job_name = unicode(settings.value("jenkins_job_name", "", type = QString)).encode('utf-8')
         jenkins_url = QApplication.instance().buid_system_path.encode('utf-8')
         jenkins_user_name = QApplication.instance().buid_system_user.encode('utf-8')
         jenkins_user_pass = QApplication.instance().buid_system_password.encode('utf-8')
@@ -36,25 +31,23 @@ class JenkinsJobSetter(QObject):
         self.started.emit("Seting job with name %s" % jenkins_job_name)
 
         try:
-            j = jenkins.Jenkins(
-                        jenkins_url,
-                        jenkins_user_name,
-                        jenkins_user_pass)
+            j = jenkins.Jenkins(jenkins_url,
+                                jenkins_user_name,
+                                jenkins_user_pass)
 
-            url = jenkins_url + "/" + jenkins.BUILD_WITH_PARAMS_JOB % {"name":jenkins_job_name}
+            url = jenkins_url + "/" + jenkins.BUILD_WITH_PARAMS_JOB % {"name": jenkins_job_name}
 
-            values = {'settings.zip': open(str(self.__config_archive), 'rb')}
+            filename = str(self.__config_archive.encode('cp1251'))
+            values = {'settings.zip': open(filename, 'rb')}
             datagen, headers = encode_parameters(values)
 
-            req = jenkins.Request( url, datagen, headers )
-            resp = j.jenkins_open(req)
+            req = jenkins.Request(url, datagen, headers)
+            j.jenkins_open(req)
 
-        #except jenkins.JenkinsException as ex:
-        #    self.error.emit(ex.message)
-        #except:
-        #    self.error.emit("Unexpected error: %s"%sys.exc_info()[0])
-        #    print sys.exc_info()
-        #    print sys.exc_info()[0]
+        except jenkins.JenkinsException as ex:
+            self.error.emit(ex.message)
+        # except:
+        #     self.error.emit("Unexpected error: %s" % sys.exc_info()[0])
         except:
             trace = traceback.format_exc()
             self.error.emit(trace)
