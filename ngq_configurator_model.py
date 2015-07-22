@@ -10,7 +10,7 @@ import traceback
 from PyQt4.QtCore import *
 from PyQt4.QtNetwork import *
 
-from logger import *
+from logger import Log
 
 
 class CustomizationOption(QObject):
@@ -65,14 +65,14 @@ class CustomizationOption(QObject):
             return self._asDict()
 
     def prepareForArchive(self, archive_root_dir):
-        Log("Prepare option {0} ({1})".format(self.getName(), self.__class__.__name__), u'debug')
+        Log(u"Prepare option {0} ({1})".format(self.getName(), self.__class__.__name__), u'debug')
         try:
             res = self._prepareForArchive(archive_root_dir)
-            Log("Prepare res: {0}".format(res), u'debug')
+            Log(u"Prepare res: {0}".format(res), u'debug')
             return res
         except:
             trace = traceback.format_exc()
-            Log("Prepare option FAIL:\n{0}".format(trace), u'error')
+            Log(u"Prepare option FAIL:\n{0}".format(trace), u'error')
             self.prepareForArchiveError.emit(trace)
             return {}
 
@@ -153,12 +153,12 @@ class QGISOptionsOption(CustomizationOption):
             return {}
 
         for opt_set_name in self.value.keys():
-            Log("QGIS options name: {0}".format(opt_set_name), u'debug')
+            Log(u"QGIS options name: {0}".format(opt_set_name), u'debug')
 
             qgis_options_dir_name = "{0}-{1}".format(opt_set_name,
                                                      os.path.basename(self.value[opt_set_name]))
 
-            Log("QGIS options dir name: {0}".format(qgis_options_dir_name), u'debug')
+            Log(u"QGIS options dir name: {0}".format(qgis_options_dir_name), u'debug')
 
             shutil.copytree(self.value[opt_set_name],
                             os.path.join(archive_root_dir, qgis_options_dir_name))
@@ -187,30 +187,30 @@ class PluginsCustomizationOption(CustomizationOption):
         counter = 0
 
         for plugin in self.value:
-            Log("Plugin name: {0}".format(plugin[u'name']), u'debug')
+            Log(u"Plugin name: {0}".format(plugin[u'name']), u'debug')
 
             get_plugin_fail = False
 
             if plugin[u'type'] == 0:
-                Log("Copy plugin from local PC: {0} START".format(os.path.join(plugin[u'dest'], plugin[u'name'])), u'debug')
+                Log(u"Copy plugin from local PC: {0} START".format(os.path.join(plugin[u'dest'], plugin[u'name'])), u'debug')
 
                 shutil.copytree(
                     os.path.join(plugin[u'dest'], plugin[u'name']),
                     os.path.join(plugins_dir, plugin[u'name']))
 
-                Log("Copy plugin from local PC FINISH", u'debug')
+                Log(u"Copy plugin from local PC FINISH", u'debug')
             elif plugin[u'type'] == 1:
-                Log("Download plugin from: {0} START".format(plugin[u'dest']), u'debug')
+                Log(u"Download plugin from: {0} START".format(plugin[u'dest']), u'debug')
 
                 self.pd = PluginDownloader(plugin[u'dest'])
                 pl_name = self.pd.download(plugins_dir)
 
                 if pl_name is None:
                     get_plugin_fail = True
-                    Log("Download plugin FAIL", u'error')
+                    Log(u"Download plugin FAIL", u'error')
                 else:
                     plugin[u'name'] = pl_name
-                    Log("Download plugin with name: {0} FINISH".format(plugin[u'name']), u'debug')
+                    Log(u"Download plugin with name: {0} FINISH".format(plugin[u'name']), u'debug')
 
             if not get_plugin_fail:
                 configuration.append({u'name': plugin[u'name']})
@@ -242,8 +242,8 @@ class AboutPagesCustomizationOption(CustomizationOption):
             configuration.append(page)
 
             if page.has_key(u'content_file'):
-                Log("New page name: {0}".format(page[u'name'][0]), u'debug')
-                Log("New page content: {0}".format(page[u'content_file']), u'debug')
+                Log(u"New page name: {0}".format(page[u'name'][0]), u'debug')
+                Log(u"New page content: {0}".format(page[u'content_file']), u'debug')
 
                 src_file = open(page[u'content_file'], "r")
                 dst_file = open(os.path.join(files_dir,
@@ -290,11 +290,11 @@ class NGQConfiguratorModel(QObject):
         self.__options = []
 
     def addOption(self, option):
-        Log("Add option: %s" % option.getName(), u'info')
+        Log(u"Add option: %s" % option.getName(), u'info')
         self.__options.append(option)
 
     def saveAsLocalSettings(self, filename):
-        Log("Save as local settings in %s START" % filename, u'info')
+        Log(u"Save as local settings in %s START" % filename, u'info')
 
         configuration = {}
         for option in self.__options:
@@ -308,7 +308,7 @@ class NGQConfiguratorModel(QObject):
 
         file.close()
 
-        Log("Save as local settings in %s FINISH" % filename, u'info')
+        Log(u"Save as local settings in %s FINISH" % filename, u'info')
 
     def saveAsArchive(self, filename):
         self.saveArchiveProgressStarted.emit()
@@ -327,10 +327,10 @@ class NGQConfiguratorModel(QObject):
         self.t.start()
 
     def loadFromLocalSettings(self, filename):
-        Log("Load local settings from %s START" % filename, u'info')
+        Log(u"Load local settings from %s START" % filename, u'info')
 
         if not os.path.exists(filename):
-            Log("Load from local settings: %s" % filename, u'error')
+            Log(u"Load from local settings: %s" % filename, u'error')
             return
 
         with open(filename, 'r') as f:
@@ -340,14 +340,14 @@ class NGQConfiguratorModel(QObject):
                 configuration = json.loads(data)
 
                 for option in self.__options:
-                    Log("Reset option {0} from json START".format(option.getName()), u'debug')
+                    Log(u"Reset option {0} from json START".format(option.getName()), u'debug')
                     option.resetFromJson(configuration)
-                    Log("Reset option {0} from json FINISH".format(option.getName()), u'debug')
+                    Log(u"Reset option {0} from json FINISH".format(option.getName()), u'debug')
 
             except ValueError as err:
-                Log("Reset option from {0}: {1}".format(filename, err), u'error')
+                Log(u"Reset option from {0}: {1}".format(filename, err), u'error')
 
-        Log("Load local settings from %s FINISH" % filename, u'info')
+        Log(u"Load local settings from %s FINISH" % filename, u'info')
 
     def loadFromArchive(self, filename):
         pass
@@ -378,7 +378,7 @@ class ConfigArchiveMaker(QObject):
             self.__must_stop = False
 
         def run(self):
-            Log("Prepare configuration archive: {0} START".format(self.__archive_name), u'info')
+            Log(u"Prepare configuration archive: {0} START".format(self.__archive_name), u'info')
             self.started.emit()
             self.progress.emit(self.__progress[0], self.__progress[1])
 
@@ -408,7 +408,7 @@ class ConfigArchiveMaker(QObject):
 
             # shutil.rmtree(settings_dir, True)
             self.finished.emit()
-            Log("Prepare configuration archive: {0} FINISH".format(self.__archive_name), u'info')
+            Log(u"Prepare configuration archive: {0} FINISH".format(self.__archive_name), u'info')
 
         def __optionPrepareError(self, trace):
             self.errorOcured.emit(trace)
@@ -449,7 +449,7 @@ class PluginDownloader(QObject):
         self.__net_request = QNetworkRequest(QUrl(self.__download_url))
 
     def download(self, dest_dir):
-        # Log("Download plugin with url: %s" % self.__download_url, u'info' )
+        # Log(u"Download plugin with url: %s" % self.__download_url, u'info' )
 
         self.loop = QEventLoop()
         self.__net_request = QNetworkRequest(QUrl(self.__download_url))
@@ -473,7 +473,7 @@ class PluginDownloader(QObject):
         download_file = os.path.join(dest_dir,
                                      download_file)
 
-        # Log("Download plugin to file: %s" % download_file, u'info')
+        # Log(u"Download plugin to file: %s" % download_file, u'info')
 
         with open(download_file, 'wb') as f:
             f.write(self.__replay.readAll())

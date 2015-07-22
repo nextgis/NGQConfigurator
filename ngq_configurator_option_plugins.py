@@ -204,12 +204,12 @@ class PluginsOption(QWidget, Ui_PluginsManagerWidget):
         plugins_settings = []
         for i in range(0, self.listWidget.count()):
             item = self.listWidget.item(i)
-            pl_set= item.data(Qt.UserRole + 1).toPyObject()
-            plugins_settings.append( {
-                u'name': pl_set.name,
+            pl_set = item.data(Qt.UserRole + 1).toPyObject()
+            plugins_settings.append({
+                u'name': unicode(pl_set.name.toUtf8(), encoding="UTF-8"),
                 u'type': pl_set.type,
-                u'dest': pl_set.dest,
-                u'repo_name': pl_set.repo_name,
-                    } )
+                u'dest': unicode(pl_set.dest.toUtf8(), encoding="UTF-8"),
+                u'repo_name': unicode(pl_set.repo_name.toUtf8(), encoding="UTF-8"),
+            })
 
         self.__option.value = plugins_settings

@@ -335,6 +335,7 @@ class NGQConfigurator(QMainWindow, Ui_NGQConfigurator):
         configuration_file = settings.value(u'configuration_file', defaultValue=QString(), type=QString)
 
         if QFileInfo(configuration_file).exists():
+            configuration_file = unicode(configuration_file.toUtf8(), encoding="UTF-8")
             self._model.loadFromLocalSettings(configuration_file)
 
     def __show_error(self, trace):

@@ -9,6 +9,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtNetwork import *
 from PyQt4.QtWebKit import *
 
+from logger import Log
+
 from ui.ui_about_page_config import Ui_Dialog as Ui_AboutPagesSettingsDialog
 from ui.ui_html_editor import Ui_HTMLEditor
 
@@ -46,11 +48,13 @@ class AboutPageSettings(QDialog, Ui_AboutPagesSettingsDialog):
         if not self.lePageContentFileName.text().isNull():
             self.pbEditPage.setEnabled(True)
 
+        Log(u"Open add\\edit about page dialog: {0}".format((name_en, name_tr, filename)), u'debug')
+
     def getValues(self):
         return (
-            unicode(self.lePageNameEn.text()),
-            unicode(self.lePageNameTr.text()),
-            unicode(self.lePageContentFileName.text())
+            unicode(self.lePageNameEn.text().toUtf8(), encoding="UTF-8"),
+            unicode(self.lePageNameTr.text().toUtf8(), encoding="UTF-8"),
+            unicode(self.lePageContentFileName.text().toUtf8(), encoding="UTF-8")
         )
 
     def choosePageContentFile(self):
@@ -108,16 +112,28 @@ class AboutPageSettings(QDialog, Ui_AboutPagesSettingsDialog):
         with open(fileName, 'r') as f:
             file_content = f.read()
 
-        print "file_content: ", file_content
-        print "file_content: ", unicode(file_content.decode('UTF-8'))
         file_content = file_content.decode('UTF-8')
-        #f = QFile(fileName)
-        #f.open(QIODevice.ReadOnly | QIODevice.Text)
-        #ts = QTextStream(f)
-        #file_content = QString(ts.readAll().toUtf8())
-        #f.close()
 
         dlg = HTMLEditor(file_content)
         if dlg.exec_():
             with open(fileName, 'w') as f:
                 f.write(dlg.pteHTMLContent.toPlainText().toUtf8())
+
+    def accept(self):
+        is_bad_form = False
+        if self.lePageNameEn.text().isEmpty():
+            self.lePageNameEn.setPlaceholderText(self.tr("Fill this!"))
+            is_bad_form = True
+
+        if self.lePageNameTr.text().isEmpty():
+            self.lePageNameTr.setPlaceholderText(self.tr("Fill this!"))
+            is_bad_form = True
+
+        if self.lePageContentFileName.text().isEmpty():
+            self.lePageContentFileName.setPlaceholderText(self.tr("Fill this!"))
+            is_bad_form = True
+
+        if is_bad_form:
+            return
+
+        QDialog.accept(self)

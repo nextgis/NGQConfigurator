@@ -50,6 +50,8 @@ class QGISOptionSetSettings(QDialog):
         if not dirPath.isNull():
             file_info = QFileInfo(dirPath)
             self.leOptionsSetDir.setText(dirPath)
+
+
 class QGISOptions(QWidget):
     def __init__(self, option, title, parent=None):
         QWidget.__init__(self, parent)
@@ -161,4 +163,3 @@ class QGISOptions(QWidget):
             self.__option.value.pop(opt_set_name)
             new_value.update(self.__option.value)
         self.__option.value = new_value
-
