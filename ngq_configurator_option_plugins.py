@@ -61,7 +61,7 @@ class PluginSettingsWidget(QDialog, Ui_AddPluginsDialog):
         self.__replay.finished.connect(self.__loadPlugins)
 
     def applayFilter(self, text):
-        indexes =  range(0, self.model.rowCount())
+        indexes = range(0, self.model.rowCount())
         for i in indexes:
             item = self.model.item(i)
             pl_name = item.data(Qt.DisplayRole).toPyObject()
@@ -113,18 +113,13 @@ class PluginSettingsWidget(QDialog, Ui_AddPluginsDialog):
                 pl_name = pl_attrs[QString('name')]
                 pl_name = unicode(pl_name.toUtf8(), encoding="UTF-8")
 
-                pl_dwn_url = unicode(
-                            pl_attrs[QString('download_url')].toUtf8(),
-                            encoding="UTF-8")
+                pl_dwn_url = unicode(pl_attrs[QString('download_url')].toUtf8(), encoding="UTF-8")
 
-                pl = PluginSettings(
-                        pl_name,
-                        PluginSettings.TypeRemote,
-                        pl_dwn_url)
+                pl = PluginSettings(pl_name,
+                                    PluginSettings.TypeRemote,
+                                    pl_dwn_url)
 
-                pl.repo_name = unicode(
-                                       self.qgisRepos.currentText().toUtf8(),
-                                       encoding="UTF-8")
+                pl.repo_name = unicode(self.qgisRepos.currentText().toUtf8(), encoding="UTF-8")
 
                 self.plugins.append(pl)
 
@@ -178,7 +173,7 @@ class PluginsOption(QWidget, Ui_PluginsManagerWidget):
         if plug_set_dialog.exec_():
             for plugin_settings in plug_set_dialog.plugins:
                 item = QListWidgetItem(self.listWidget)
-                item.setData(Qt.DisplayRole, plugin_settings.name + " [%s]"%plugin_settings.repo_name)
+                item.setData(Qt.DisplayRole, plugin_settings.name + " [%s]" % plugin_settings.repo_name)
                 item.setData(Qt.UserRole + 1, plugin_settings)
 
             self.updatePluginsSettings()
@@ -191,9 +186,9 @@ class PluginsOption(QWidget, Ui_PluginsManagerWidget):
         if not dirPath.isNull():
             file_info = QFileInfo(dirPath)
             settings = PluginSettings(
-                    unicode(file_info.baseName()),
+                    unicode(file_info.baseName().toUtf8(), encoding="UTF-8"),
                     PluginSettings.TypeLocal,
-                    unicode(file_info.absolutePath())
+                    unicode(file_info.absolutePath().toUtf8(), encoding="UTF-8"),
             )
             item = QListWidgetItem(self.listWidget)
             item.setData(Qt.DisplayRole, settings.name + " [%s]"%settings.dest)
@@ -206,10 +201,10 @@ class PluginsOption(QWidget, Ui_PluginsManagerWidget):
             item = self.listWidget.item(i)
             pl_set = item.data(Qt.UserRole + 1).toPyObject()
             plugins_settings.append({
-                u'name': unicode(pl_set.name.toUtf8(), encoding="UTF-8"),
+                u'name': pl_set.name,
                 u'type': pl_set.type,
-                u'dest': unicode(pl_set.dest.toUtf8(), encoding="UTF-8"),
-                u'repo_name': unicode(pl_set.repo_name.toUtf8(), encoding="UTF-8"),
+                u'dest': pl_set.dest,
+                u'repo_name': pl_set.repo_name,
             })
 
         self.__option.value = plugins_settings
