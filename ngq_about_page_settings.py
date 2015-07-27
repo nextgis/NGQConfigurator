@@ -16,18 +16,17 @@ from ui.ui_html_editor import Ui_HTMLEditor
 
 
 class HTMLEditor(QDialog, Ui_HTMLEditor):
-    def __init__(self, text = "", parent=None):
+    def __init__(self, text=QString(), parent=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
-        self.pteHTMLContent.setPlainText (text)
+        self.pteHTMLContent.setPlainText(text)
         self.__htmlContentChanged()
 
         self.pteHTMLContent.textChanged.connect(self.__htmlContentChanged)
 
     def __htmlContentChanged(self):
-        #print self.pteHTMLContent.toPlainText().toUtf8()
-        self.tbHTMLResult.setHtml( self.pteHTMLContent.toPlainText() )
+        self.tbHTMLResult.setHtml(self.pteHTMLContent.toPlainText())
 
 
 class AboutPageSettings(QDialog, Ui_AboutPagesSettingsDialog):
@@ -45,7 +44,7 @@ class AboutPageSettings(QDialog, Ui_AboutPagesSettingsDialog):
 
         self.hlPageContetntControls.setAlignment(Qt.AlignRight)
 
-        if not self.lePageContentFileName.text().isNull():
+        if not self.lePageContentFileName.text().isEmpty():
             self.pbEditPage.setEnabled(True)
 
         Log(u"Open add\\edit about page dialog: {0}".format((name_en, name_tr, filename)), u'debug')
@@ -90,12 +89,10 @@ class AboutPageSettings(QDialog, Ui_AboutPagesSettingsDialog):
             if fileName.isNull() == False:
                 fileName = unicode(fileName.toUtf8(), encoding="UTF-8")
 
-                file_content = unicode(
-                                dlg.pteHTMLContent.toPlainText().toUtf8(),
-                                encoding="UTF-8")
-
-                with open(fileName, 'w') as f:
-                    f.write(file_content)
+                file = QFile(fileName)
+                file.open(QIODevice.WriteOnly | QIODevice.Text)
+                file.write(dlg.pteHTMLContent.toPlainText().toUtf8())
+                file.close()
 
                 settings.setValue(u'about_page_content_file', fileName)
                 self.lePageContentFileName.setText(fileName)
@@ -109,15 +106,26 @@ class AboutPageSettings(QDialog, Ui_AboutPagesSettingsDialog):
 
         file_content = ""
 
-        with open(fileName, 'r') as f:
-            file_content = f.read()
+        #with open(fileName, 'r') as f:
+        #    file_content = f.read()
 
-        file_content = file_content.decode('UTF-8')
+        #file_content = file_content.decode('UTF-8')
+        file = QFile(fileName)
+        if not file.exists():
+            return
+
+        file.open(QIODevice.ReadOnly | QIODevice.Text)
+        stream = QTextStream(file)
+        stream.setCodec("UTF-8")
+        file_content = stream.readAll()
+        file.close()
 
         dlg = HTMLEditor(file_content)
         if dlg.exec_():
-            with open(fileName, 'w') as f:
-                f.write(dlg.pteHTMLContent.toPlainText().toUtf8())
+            file = QFile(fileName)
+            file.open(QIODevice.WriteOnly | QIODevice.Text)
+            file.write(dlg.pteHTMLContent.toPlainText().toUtf8())
+            file.close()
 
     def accept(self):
         is_bad_form = False
